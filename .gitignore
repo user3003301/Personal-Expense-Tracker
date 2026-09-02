@@ -41,7 +41,12 @@ Thumbs.db:encryptable
 ehthumbs.db
 ehthumbs_vista.db
 
+# Python cache
+src/__pycache__
 # Dump file
+Project-Overflow.txt
+docs
+tests
 *.stackdump
 
 # Folder config file
