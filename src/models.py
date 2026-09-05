@@ -4,17 +4,48 @@ from decimal import Decimal, ROUND_HALF_UP
 from datetime import date
 from dataclasses import dataclass, field
 
-# TODO think about Python compatibility
-# @dataclass was added in Python 3.7, use @attr for Python 2.7 and later.
+
+@dataclass
+class Category:
+    """Represents a category"""
+    _name: str
+    
+    def __post_init__(self):
+        self.name = self._name
+
+    @property
+    def name(self) -> str:
+        """the category name"""
+        return self._name
+
+    @name.setter
+    def name(self, value: str) -> None:
+        if not isinstance(value, str):
+            raise TypeError("The category name must be a string")
+        if len(value) < 1 or value.isspace():
+            raise ValueError("the category name cannot be empty or whitespace")
+        self._name = value
+
+    def __str__(self) -> str:
+        return f"name: {self._name}"
+
 
 @dataclass
 class Expense:
     """Represents a single expense"""
     _name: str
-    _amount: Decimal = field(compare=True)
-    _category: object
-    _dateOfRegistration: date = field(default=date.today())
+    _amount: Decimal
+    _category: Category
+    _expense_date: date = field(default=None)
 
+    def __post_init__(self):
+        self.name = self._name
+        self.amount = self._amount
+        self.category = self._category
+        if self._expense_date is not None:
+            self.expense_date = self._expense_date
+        else:
+            self.expense_date = date.today()
 
     @property
     def name(self) -> str:
@@ -22,9 +53,11 @@ class Expense:
         return self._name
 
     @name.setter
-    def name(self, value) -> None:
+    def name(self, value: str) -> None:
         if not isinstance(value, str):
-            raise TypeError("Description must be a string")
+            raise TypeError("The name of the expense must be a string")
+        if len(value) < 1 or value.isspace():
+                    raise ValueError("the name of the expense cannot be empty or whitespace")
         self._name = value
 
     @property
@@ -33,58 +66,35 @@ class Expense:
         return self._amount
 
     @amount.setter
-    def amount(self, value) -> None:
-        if not isinstance(value, float):
-            raise TypeError("Amount must be a float")
+    def amount(self, value: Decimal) -> None:
+        if not isinstance(value, Decimal):
+            raise TypeError("the cost must be a Decimal")
         price = Decimal(value)
         self._amount = price.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
     @property
-    def category(self) -> object:
+    def category(self) -> Category:
         """the category of the expense"""
         return self._category
     
     @category.setter
-    def category(self, value) -> None:
+    def category(self, value: Category) -> None:
         if not isinstance(value, Category):
-            raise TypeError("Category must be a Category object")
+            raise TypeError("the category must be a Category object")
         self._category = value
 
     @property
-    def dateOfRegistration(self) -> date:
+    def expense_date(self) -> date:
         """the expense date"""
-        return self._dateOfRegistration
+        return self._expense_date
 
-    @dateOfRegistration.setter
-    def dateOfRegistration(self, value) -> None:
+    @expense_date.setter
+    def expense_date(self, value: date) -> None:
         if not isinstance(value, date):
-            raise TypeError("The date must be a date(year, mounth, day)")
-        self._dateOfRegistration = value
+            raise TypeError("The date must be a date(year, month, day)")
+        self._expense_date = value
 
     # print class variable
     def __str__(self) -> str:
-        return f"name: {self._name}, amount: {self._amount}, category[{self._category}], date: {self._dateOfRegistration}\n"
-
-
-@dataclass
-class Category:
-    """Represents a category"""
-    _name: str = field(repr=True)
+        return f"name: {self._name}, amount: {self._amount}, category[{self._category}], date: {self._expense_date}"
     
-
-    # getter and setter
-    @property
-    def name(self) -> str:
-        """the name of the category"""
-        return self._name
-
-    @name.setter
-    def name(self, value: str) -> None:
-        if (not isinstance(value, str)) or len(value) < 1:
-            print("the category name must be a string, setting to: Not Setted")
-            self._name = "Not Setted"
-        self._name = value
-
-    # print class variable
-    def __str__(self) -> str:
-        return f"name: {self._name}"

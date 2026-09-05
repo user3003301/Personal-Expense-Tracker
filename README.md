@@ -2,6 +2,8 @@
 
 A terminal application for managing income, expenses, categories, and statistics, with data saved to a file.
 
+## Requirements
+Python 3.7 or later
 
 ## Installation
 
