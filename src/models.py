@@ -2,6 +2,7 @@
 
 from decimal import Decimal, ROUND_HALF_UP
 from datetime import date
+import utility
 from dataclasses import dataclass, field
 
 
@@ -96,5 +97,7 @@ class Expense:
 
     # print class variable
     def __str__(self) -> str:
-        return f"name: {self._name}, amount: {self._amount}, category[{self._category}], date: {self._expense_date}"
+        return "name: {}, amount: {}, category[{}], date: {}".format(
+            self._name, self._amount, self._category, utility.date_to_string(self._expense_date)
+            )
     
