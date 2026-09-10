@@ -34,6 +34,7 @@ class Category:
 @dataclass
 class Expense:
     """Represents a single expense"""
+    _id: int | None = field(init=False, compare=False, default=None)
     _name: str
     _amount: Decimal
     _category: Category
@@ -47,6 +48,11 @@ class Expense:
             self.expense_date = self._expense_date
         else:
             self.expense_date = date.today()
+
+    @property
+    def id(self):
+        """the id of the expense"""
+        return self._id
 
     @property
     def name(self) -> str:
@@ -87,7 +93,7 @@ class Expense:
     @property
     def expense_date(self) -> date:
         """the expense date"""
-        return self._expense_date
+        return utility.date_to_string(self._expense_date)
 
     @expense_date.setter
     def expense_date(self, value: date) -> None:
@@ -97,7 +103,7 @@ class Expense:
 
     # print class variable
     def __str__(self) -> str:
-        return "name: {}, amount: {}, category[{}], date: {}".format(
-            self._name, self._amount, self._category, utility.date_to_string(self._expense_date)
+        return "id: {}, name: {}, amount: {}, category[{}], date: {}".format(
+            self._id, self._name, self._amount, self._category, utility.date_to_string(self._expense_date)
             )
     
