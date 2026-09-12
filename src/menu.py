@@ -7,11 +7,10 @@ import utility
 import storage
 
 
-def run():
-    loop = True
+def main_menu():
     print("Personal Expense Tracker\n")
 
-    while loop:
+    while True:
         print("""Choose your operation:
     1. Expense management
     2. Expense report
@@ -21,19 +20,19 @@ def run():
         match(x):
             case "1": expense_menu()
             case "2": print("Report menu\n")
-            case "3": loop = False
+            case "3": break
             case _: print("Select a number from those shown\n")
 
     print("\nGoodbye")
 
 def expense_menu():
     while True:
-        print(""""Expense management:
+        print("""Expense management:
     1. Create expense
     2. Search expense
     3. Update expense
     4. Delete expense
-    5. Exit
+    5. Back
     """)
         x = input("-> ")
         match(x):
@@ -43,6 +42,7 @@ def expense_menu():
             case "4": handle_delete_expense()
             case "5": break
             case _: print("Select a number from those shown\n")
+    print()
 
 def create_expense():
     """Create a new expense"""
@@ -132,7 +132,7 @@ def check_input_string(output: str, word: str) -> str:
     while word == "" or word.isspace():
         print(f"Invalid {output}! Try again.")
         word = input(output)
-    return word
+    return word.strip().capitalize()
 
 def check_input_integer() -> int:
     """Check whether the input is a positive integer number"""
