@@ -93,7 +93,7 @@ class Expense:
     @property
     def expense_date(self) -> date:
         """the expense date"""
-        return utility.date_to_string(self._expense_date)
+        return self._expense_date
 
     @expense_date.setter
     def expense_date(self, value: date) -> None:

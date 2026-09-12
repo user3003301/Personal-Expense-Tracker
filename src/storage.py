@@ -1,9 +1,61 @@
 # Data management
 
-from models import Expense
+from models import Expense, Category
+from decimal import Decimal
+import utility
+import json
+
 
 expense_list: list[Expense] = []
-count: int = 1
+count: int = 0
+
+def load_expenses() -> None:
+    global expense_list, count
+    try: # Check if file exists
+        with open("data/expenses.json", "r", encoding="UTF-8") as file:
+            expenses_data = json.load(file)
+    except FileNotFoundError:
+        expenses_data = ""
+
+    if expenses_data != "":
+        max_id = 0
+        for expense_data in expenses_data:
+            
+            expense_id = expense_data.get("id")
+            name = expense_data.get("name")
+            amount = Decimal(expense_data.get("amount"))
+            category = Category(expense_data.get("category"))
+            expense_date = utility.string_to_date(expense_data.get("expense_date"))
+            loaded_expense = Expense(name, amount, category, expense_date)
+            loaded_expense._id = expense_id
+            expense_list.append(loaded_expense)
+
+            if max_id < expense_id: 
+                max_id = expense_id
+                
+        count = max_id + 1
+
+def save_expenses() -> None:
+    expenses_data = []
+    for expense in expense_list:
+        expense_id = expense.id
+        name = expense.name
+        amount = str(expense.amount)
+        category = expense.category.name
+        expense_date = utility.date_to_string(expense.expense_date)
+
+        expense_data = {}
+        expense_data["id"] = expense_id
+        expense_data["name"] = name
+        expense_data["amount"] = amount
+        expense_data["category"] = category
+        expense_data["expense_date"] = expense_date
+
+        expenses_data.append(expense_data)
+
+    with open("data/expenses.json", "w", encoding="UTF-8 ") as file:
+        json.dump(expenses_data, file)
+    
 
 def get_all_expenses():
     return expense_list

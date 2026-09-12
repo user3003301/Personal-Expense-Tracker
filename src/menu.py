@@ -62,6 +62,7 @@ def create_expense():
     expense = Expense(name, cost, Category(category), expense_date)
     
     storage.add_expense(expense)
+    storage.save_expenses()
 
 def handle_search_expense():
     """Search an expense in the list"""
@@ -111,6 +112,7 @@ def handle_update_expense():
         result = storage.update_expense(searched_id, new_expense)
         if result:
             print("Expense updated successfully")
+            storage.save_expenses()
         else:
             # Only god know why this operation failed after all validation and control :(
             print("Expense not updated")
@@ -121,6 +123,7 @@ def handle_delete_expense():
     expense_deleted = storage.delete_expense(searched_id)
     if expense_deleted:
         print("Expense deleted successfully")
+        storage.save_expenses()
     else:
         print("Expense not found!")
 
