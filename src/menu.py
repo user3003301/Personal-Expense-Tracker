@@ -3,8 +3,7 @@
 from decimal import Decimal, InvalidOperation
 from models import Expense, Category
 from datetime import date
-import utility
-import storage
+import utility, storage, filters
 
 
 def main_menu():
@@ -72,6 +71,56 @@ def handle_search_expense():
         print(expense_found)
     else:
         print("Expense not found!")
+
+def handle_filter_search():
+    """Search an expense by multiple filters"""
+    filters.initialise_search()
+    
+    # cost filter
+    min_cost = input("Minimum cost [Enter to skip]: ")
+    if min_cost != "":
+        min_cost = check_input_decimal(min_cost)
+    max_cost = input("Maximum cost [Enter to skip]: ")
+    if max_cost != "":
+        max_cost = check_input_decimal(max_cost)
+
+    if min_cost != "" or max_cost != "":
+        if min_cost == "": min_cost = None
+        if max_cost == "": max_cost = None
+        filters.filter_by_cost(min_cost, max_cost)
+
+    # category filter
+    category = input("Category: [Enter to skip]: ")
+    if category != "":
+        category = check_input_string("Category: ", category)
+        filters.filter_by_category(category)
+
+    # date filter
+    date_only = ""
+    first_date = input("First date [Enter to skip]: ")
+    if first_date != "":
+        first_date = check_date_format(first_date)
+
+        date_only = input("Only this date? (y,n): ")
+        while date_only != 'y' and date_only != 'n':
+            date_only = input("Only this date? (y,n): ")
+        if date_only.lower() == "y":
+            filters.filter_by_date(first_date)
+    
+    if date_only != "y":
+        second_date = input("Second date [Enter to skip]: ")
+        if second_date != "":
+            second_date = check_date_format(second_date)
+
+            if first_date == "": first_date = None
+            if second_date == "": second_date = None
+            filters.filter_by_date_range(first_date, second_date)
+
+    filtered_expenses = filters.get_filtered_expenses()
+    if filtered_expenses:
+        for expense in filtered_expenses:
+            print(expense)
+    else: print("No expense found.")
 
 def handle_update_expense():
     """Update an existing expense"""

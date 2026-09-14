@@ -7,9 +7,10 @@ import json
 
 
 expense_list: list[Expense] = []
-count: int = 0
+count: int = 1
 
 def load_expenses() -> None:
+    """Read the JSON file and save the expenses in a list"""
     global expense_list, count
     try: # Check if file exists
         with open("data/expenses.json", "r", encoding="UTF-8") as file:
@@ -36,6 +37,7 @@ def load_expenses() -> None:
         count = max_id + 1
 
 def save_expenses() -> None:
+    """Save the expenses in expenses_list in a JSON file"""
     expenses_data = []
     for expense in expense_list:
         expense_id = expense.id
@@ -57,11 +59,12 @@ def save_expenses() -> None:
         json.dump(expenses_data, file)
     
 
-def get_all_expenses():
-    return expense_list
+def get_all_expenses() -> list[Expense]:
+    """Return a list of expenses saved in a file"""
+    return expense_list.copy()
 
 def add_expense(expense: Expense) -> None:
-    """add a new expense in the expense list"""
+    """Add a new expense in the expense list"""
     global count
     expense._id = count
     expense_list.append(expense)
@@ -85,6 +88,7 @@ def update_expense(id: int, new_expense: Expense) -> bool:
     return False
 
 def delete_expense(id: int) -> bool:
+    """Delete an expense passing its id"""
     for e in expense_list:
         if id == e._id:
             expense_list.remove(e)
