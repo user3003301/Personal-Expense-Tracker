@@ -3,14 +3,14 @@
 from decimal import Decimal, InvalidOperation
 from models import Expense, Category
 from datetime import date
-import utility, storage, filters
+import utility, storage, filters, expense_statistics
 
 
 def main_menu():
     print("Personal Expense Tracker\n")
 
     while True:
-        print("""Choose your operation:
+        print("""\nChoose your operation:
     1. Expense management
     2. Expense report
     3. Exit
@@ -18,7 +18,7 @@ def main_menu():
         x = input("-> ")
         match(x):
             case "1": expense_menu()
-            case "2": print("Report menu\n")
+            case "2": report_menu()
             case "3": break
             case _: print("Select a number from those shown\n")
 
@@ -26,7 +26,7 @@ def main_menu():
 
 def expense_menu():
     while True:
-        print("""Expense management:
+        print("""\nExpense management:
     1. Create expense
     2. Search expense
     3. Update expense
@@ -36,12 +36,43 @@ def expense_menu():
         x = input("-> ")
         match(x):
             case "1": create_expense()
-            case "2": handle_search_expense()
+            case "2": handle_filter_search()
             case "3": handle_update_expense()
             case "4": handle_delete_expense()
             case "5": break
-            case _: print("Select a number from those shown\n")
+            case _: print("Select a number from those shown")
     print()
+
+def report_menu():
+    expense_statistics.get_expenses_list()
+
+    while True:
+        print(f"""\nExpense report
+
+    Current expenses: {expense_statistics.get_total_expenses()}
+
+    1. Reset Filters
+    2. Total amount
+    3. Average amount
+    4. Minimum expense
+    5. Maximum expense
+    6. Amount by category
+    7. Back""")
+        x = input("-> ")
+
+        match(x):
+            case "1": reset_filter()
+            case "2": print(f"\nTotal amount: {expense_statistics.get_total_amount()}")
+            case "3": print(f"\nAverage amount: {expense_statistics.get_average_amount()}")
+            case "4": print(f"\nMinimum amount: {expense_statistics.get_min_amount()}")
+            case "5": print(f"\nMaximum amount: {expense_statistics.get_max_amount()}")
+            case "6": 
+                category_dict = expense_statistics.get_amount_by_category()
+                for k, v, in category_dict.items():
+                    print(f"{k}: {v}")
+            case "7": break
+            case _: print("Select a number from those shown")
+
 
 def create_expense():
     """Create a new expense"""
@@ -74,7 +105,7 @@ def handle_search_expense():
 
 def handle_filter_search():
     """Search an expense by multiple filters"""
-    filters.initialise_search()
+    filters.set_filter_list()
     
     # cost filter
     min_cost = input("Minimum cost [Enter to skip]: ")
@@ -218,3 +249,8 @@ def check_date_format(in_date) -> date | None:
         
         print("Date in day/month/year format (press Enter if it's today): ")
         in_date = input("-> ")
+
+def reset_filter():
+    """Reset the list"""
+    filters.set_filter_list()
+    expense_statistics.get_expenses_list()

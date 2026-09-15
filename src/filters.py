@@ -8,14 +8,14 @@ import storage
 
 current_expenses = []
 
-def initialise_search() -> None:
+def set_filter_list() -> None:
     """Get a copy of the list containig saved expenses"""
     global current_expenses
     current_expenses = storage.get_all_expenses()
 
 def get_filtered_expenses() -> list[Expense]:
     """Return the filtered expense list"""
-    return current_expenses
+    return current_expenses.copy()
 
 def filter_by_category(category: str) -> list[Expense]:
     """Filters the current search results by category and saves it as the new current result."""
