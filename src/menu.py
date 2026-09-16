@@ -12,14 +12,16 @@ def main_menu():
     while True:
         print("""\nChoose your operation:
     1. Expense management
-    2. Expense report
-    3. Exit
+    2. Expense statistics
+    3. Expense report
+    4. Exit
         """)
         x = input("-> ")
         match(x):
             case "1": expense_menu()
-            case "2": report_menu()
-            case "3": break
+            case "2": statistics_menu()
+            case "3": report_menu()
+            case "4": break
             case _: print("Select a number from those shown\n")
 
     print("\nGoodbye")
@@ -43,7 +45,7 @@ def expense_menu():
             case _: print("Select a number from those shown")
     print()
 
-def report_menu():
+def statistics_menu():
     expense_statistics.get_expenses_list()
 
     while True:
@@ -73,6 +75,19 @@ def report_menu():
             case "7": break
             case _: print("Select a number from those shown")
 
+def report_menu():
+    while True:
+        print("""\nChoose your operation:
+    1. Montly report
+    2. Yearly report
+    3. Back
+        """)
+        x = input("-> ")
+        match(x):
+            case "1": handle_monthly_report()
+            case "2": handle_yearly_report()
+            case "3": break
+            case _: print("Select a number from those shown\n")
 
 def create_expense():
     """Create a new expense"""
@@ -96,7 +111,7 @@ def create_expense():
 
 def handle_search_expense():
     """Search an expense in the list"""
-    searched_id = check_input_integer()
+    searched_id = check_input_integer("Insert ID: ")
     expense_found = storage.search_expense(searched_id)
     if expense_found is not None:
         print(expense_found)
@@ -155,7 +170,7 @@ def handle_filter_search():
 
 def handle_update_expense():
     """Update an existing expense"""
-    searched_id = check_input_integer()
+    searched_id = check_input_integer("Insert ID: ")
     expense_found = storage.search_expense(searched_id)
     if expense_found is None:
         print("Expense not found!")
@@ -199,7 +214,7 @@ def handle_update_expense():
 
 def handle_delete_expense():
     """Delete an existing expense"""
-    searched_id = check_input_integer()
+    searched_id = check_input_integer("Insert ID: ")
     expense_deleted = storage.delete_expense(searched_id)
     if expense_deleted:
         print("Expense deleted successfully")
@@ -207,6 +222,25 @@ def handle_delete_expense():
     else:
         print("Expense not found!")
 
+def handle_monthly_report():
+    print("\nMontly report\n")
+    month = 13
+    while month > 12:
+        month = check_input_integer("Insert month: ")
+    year = check_input_integer("Insert year: ")
+
+    print()
+    result = expense_statistics.get_monthly_report(month, year)
+    print_report(result)
+
+def handle_yearly_report():
+    print("\nYearly report\n")
+    year = check_input_integer("Insert year: ")
+
+    print()
+    result = expense_statistics.get_yearly_report(year)
+    print_report(result)
+        
 def check_input_string(output: str, word: str) -> str:
     """Check that the string is not empty or that it does not consist solely of consecutive spaces"""
     while word == "" or word.isspace():
@@ -214,17 +248,17 @@ def check_input_string(output: str, word: str) -> str:
         word = input(output)
     return word.strip().capitalize()
 
-def check_input_integer() -> int:
+def check_input_integer(output: str) -> int:
     """Check whether the input is a positive integer number"""
     while True:
         try:
-            number = int(input("Insert expense ID: "))
+            number = int(input(output))
             if number > 0:
                 return number
             else:
                 print("The number must be positive and not zero")
         except ValueError:
-            print("Invalid ID input! Try again")
+            print(f"Invalid input! Try again")
 
 def check_input_decimal(number: str) -> Decimal:
     """Check whether the input is a positive number—either an integer or a decimal."""
@@ -254,3 +288,16 @@ def reset_filter():
     """Reset the list"""
     filters.set_filter_list()
     expense_statistics.get_expenses_list()
+
+def print_report(result: dict):
+    if result is None:
+        print("No expense found in this period.")
+    else:
+        for key, value in result.items():
+            if key == "expensive_category":
+                print("expensive_category: ")
+                for i in range(len(value)):
+                    for key2, value2 in value[i].items():
+                        print(f"\t{key2}: {value2}")
+                    print()
+            else: print(f"{key}: {value}")
