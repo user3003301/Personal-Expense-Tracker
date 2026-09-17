@@ -2,8 +2,8 @@
 
 from decimal import Decimal
 from datetime import date
-from models import Expense
-import storage
+from .models import Expense
+from src import storage
 
 
 current_expenses = []

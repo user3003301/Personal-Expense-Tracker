@@ -1,16 +1,17 @@
 # CLI management menu
 
 from decimal import Decimal, InvalidOperation
-from models import Expense, Category
 from datetime import date
-import utility, storage, filters, expense_statistics
+from .models import Expense, Category
+from src import utility, storage, filters, expense_statistics
+from enums.error_codes import ErrorCode
 
 
 def main_menu():
-    print("Personal Expense Tracker\n")
+    print("\nPersonal Expense Tracker\n")
 
     while True:
-        print("""\nChoose your operation:
+        print("""Choose your operation:
     1. Expense management
     2. Expense statistics
     3. Expense report
@@ -240,7 +241,33 @@ def handle_yearly_report():
     print()
     result = expense_statistics.get_yearly_report(year)
     print_report(result)
-        
+
+def handle_corrupted_file() -> bool:
+    print("EXPENSE FILE IS CORRUPTED!\n")
+    answer = ""
+    while answer != 'Y' and answer != 'N':
+        print("If you want to exit > enter 'n'")
+        print("If you want to backup the corrupted file and continue > enter 'y'")
+        answer = input("-> ")
+        answer = check_input_string("y or n: ", answer)
+    
+    if answer == 'Y':
+        result = storage.backup_corrupted_file()
+        match(result):
+            case ErrorCode.SUCCESS: return True
+            case ErrorCode.SRC_NOT_FOUND: 
+                print("Source file not found.")
+                return False
+            case ErrorCode.DST_EXISTS:
+                print("Destination already exists.")
+                return False
+            case ErrorCode.OS_ERROR: 
+                print("OS error")
+                return False
+    else:
+        print("I'm closing the program.")
+        return False
+
 def check_input_string(output: str, word: str) -> str:
     """Check that the string is not empty or that it does not consist solely of consecutive spaces"""
     while word == "" or word.isspace():

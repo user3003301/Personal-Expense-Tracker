@@ -1,9 +1,17 @@
 # Data management
 
-from models import Expense, Category
-from decimal import Decimal
-import utility
+import os
 import json
+from decimal import Decimal
+from datetime import datetime
+from json import JSONDecodeError
+from src.models import Expense, Category
+from src import utility
+from enums.error_codes import ErrorCode
+from exception.exceptions import StorageDataCorruptedError
+
+
+
 
 
 expense_list: list[Expense] = []
@@ -17,6 +25,8 @@ def load_expenses() -> None:
             expenses_data = json.load(file)
     except FileNotFoundError:
         expenses_data = ""
+    except JSONDecodeError:
+        raise StorageDataCorruptedError()
 
     if expenses_data != "":
         max_id = 0
@@ -57,7 +67,6 @@ def save_expenses() -> None:
 
     with open("data/expenses.json", "w", encoding="UTF-8 ") as file:
         json.dump(expenses_data, file)
-    
 
 def get_all_expenses() -> list[Expense]:
     """Return a list of expenses saved in a file"""
@@ -94,3 +103,18 @@ def delete_expense(id: int) -> bool:
             expense_list.remove(e)
             return True
     return False
+
+def backup_corrupted_file() -> ErrorCode:
+    date_and_time = datetime.strftime(datetime.now(), "%Y%m%d_%H%M%S")
+    try:
+        os.rename("data/expenses.json", f"data/expenses_corrupted_{date_and_time}.json")
+        with open("data/expenses.json", "w", encoding="UTF-8") as new_file:
+            new_file.write("[]")
+        return ErrorCode.SUCCESS
+    except FileNotFoundError:
+        return ErrorCode.SRC_NOT_FOUND
+    except FileExistsError:
+        return ErrorCode.DST_EXISTS
+    except OSError:
+        return ErrorCode.OS_ERROR 
+
