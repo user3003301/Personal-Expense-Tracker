@@ -1,19 +1,19 @@
 # Data management
 
-import os
-import json
+## Standard libray
+from os import rename
+from json import load as jsonload, dump as jsondump, JSONDecodeError
+from logging import getLogger
 from decimal import Decimal
 from datetime import datetime
-from json import JSONDecodeError
+
+## Local project module
 from src.models import Expense, Category
 from src import utility
 from enums.error_codes import ErrorCode
 from exception.exceptions import StorageDataCorruptedError
 
-
-
-
-
+logger = getLogger(__name__)
 expense_list: list[Expense] = []
 count: int = 1
 
@@ -22,10 +22,11 @@ def load_expenses() -> None:
     global expense_list, count
     try: # Check if file exists
         with open("data/expenses.json", "r", encoding="UTF-8") as file:
-            expenses_data = json.load(file)
+            expenses_data = jsonload(file)
     except FileNotFoundError:
         expenses_data = ""
     except JSONDecodeError:
+        logger.error("The JSON file data/expenses.json is corrupted")
         raise StorageDataCorruptedError()
 
     if expenses_data != "":
@@ -43,8 +44,9 @@ def load_expenses() -> None:
 
             if max_id < expense_id: 
                 max_id = expense_id
-                
+
         count = max_id + 1
+    logger.info("Loading complete")
 
 def save_expenses() -> None:
     """Save the expenses in expenses_list in a JSON file"""
@@ -65,8 +67,9 @@ def save_expenses() -> None:
 
         expenses_data.append(expense_data)
 
-    with open("data/expenses.json", "w", encoding="UTF-8 ") as file:
-        json.dump(expenses_data, file)
+    with open("data/expenses.json", "w", encoding="UTF-8") as file:
+        jsondump(expenses_data, file)
+    logger.info("Save completed")
 
 def get_all_expenses() -> list[Expense]:
     """Return a list of expenses saved in a file"""
@@ -81,9 +84,10 @@ def add_expense(expense: Expense) -> None:
 
 def search_expense(id: int) -> Expense | None:
     """Return an expense by its id"""
-    for e in expense_list:
-        if id == e._id:
-            return e
+    for expense in expense_list:
+        if id == expense.id:
+            return expense
+    return None
 
 def update_expense(id: int, new_expense: Expense) -> bool:
     """Update an expense passing its id and new values by expense obj"""
@@ -107,14 +111,18 @@ def delete_expense(id: int) -> bool:
 def backup_corrupted_file() -> ErrorCode:
     date_and_time = datetime.strftime(datetime.now(), "%Y%m%d_%H%M%S")
     try:
-        os.rename("data/expenses.json", f"data/expenses_corrupted_{date_and_time}.json")
+        rename("data/expenses.json", f"data/expenses_corrupted_{date_and_time}.json")
         with open("data/expenses.json", "w", encoding="UTF-8") as new_file:
             new_file.write("[]")
+        logger.info("Backed up the damaged file and created a new file")
         return ErrorCode.SUCCESS
     except FileNotFoundError:
+        logger.error("Source file not found")
         return ErrorCode.SRC_NOT_FOUND
     except FileExistsError:
+        logger.error("The filename already exists")
         return ErrorCode.DST_EXISTS
     except OSError:
+        logger.error("I/O error")
         return ErrorCode.OS_ERROR 
 

@@ -1,9 +1,12 @@
 # Contains model data
 
+## Standard library
 from decimal import Decimal, ROUND_HALF_UP
 from datetime import date
-from src import utility
 from dataclasses import dataclass, field
+
+## Local project module
+from src import utility
 
 
 @dataclass
@@ -23,7 +26,7 @@ class Category:
     def name(self, value: str) -> None:
         if not isinstance(value, str):
             raise TypeError("The category name must be a string")
-        if len(value) < 1 or value.isspace():
+        if value == "" or value.isspace():
             raise ValueError("the category name cannot be empty or whitespace")
         self._name = value
 
@@ -40,7 +43,7 @@ class Expense:
     _category: Category
     _expense_date: date = field(default=None)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.name = self._name
         self.amount = self._amount
         self.category = self._category
@@ -50,7 +53,7 @@ class Expense:
             self.expense_date = date.today()
 
     @property
-    def id(self):
+    def id(self) -> int:
         """the id of the expense"""
         return self._id
 
@@ -63,8 +66,8 @@ class Expense:
     def name(self, value: str) -> None:
         if not isinstance(value, str):
             raise TypeError("The name of the expense must be a string")
-        if len(value) < 1 or value.isspace():
-                    raise ValueError("the name of the expense cannot be empty or whitespace")
+        if value == "" or value.isspace():
+            raise ValueError("the name of the expense cannot be empty or whitespace")
         self._name = value
 
     @property
@@ -76,8 +79,7 @@ class Expense:
     def amount(self, value: Decimal) -> None:
         if not isinstance(value, Decimal):
             raise TypeError("the cost must be a Decimal")
-        price = Decimal(value)
-        self._amount = price.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        self._amount = value.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
     @property
     def category(self) -> Category:
@@ -103,7 +105,7 @@ class Expense:
 
     # print class variable
     def __str__(self) -> str:
-        return "id: {}, name: {}, amount: {}, category[{}], date: {}".format(
+        return "id: {}, name: {}, amount: {}, category_{}, date: {}".format(
             self._id, self._name, self._amount, self._category, utility.date_to_string(self._expense_date)
             )
     

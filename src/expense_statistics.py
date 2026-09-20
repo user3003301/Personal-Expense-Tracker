@@ -1,17 +1,21 @@
 # Elaborate expense statistics
 
+## Standard library
 from decimal import Decimal, ROUND_HALF_UP
 from datetime import date
 from calendar import month_name
-from .models import Expense
-from src import filters, storage
+
+## Local project module
+from src.models import Expense
+from src.storage import get_all_expenses
+from src.filters import get_filtered_expenses
 
 current_expenses = []
 
-def get_expenses_list():
+def get_expenses_list() -> None:
     """Get the list of expenses from a filtered list"""
     global current_expenses
-    current_expenses = filters.get_filtered_expenses()
+    current_expenses = get_filtered_expenses()
 
 def get_total_expenses() -> int:
     """Return the number of expenses in the list"""
@@ -20,18 +24,18 @@ def get_total_expenses() -> int:
 def get_total_amount(alternative_list: list[Expense] | None = None) -> Decimal:
     """Returns the sum of the expenses"""
     if alternative_list is None:
-        category_list = current_expenses
+        expense_to_process = current_expenses
     else:
-        category_list = alternative_list
+        expense_to_process = alternative_list
 
     total = Decimal('0')
-    for expense in category_list:
+    for expense in expense_to_process:
         total = total + expense.amount
 
     return total
 
 def get_average_amount() -> Decimal:
-    """Returns the average cost of a expense"""
+    """Returns the average cost of an expense"""
     total = Decimal('0')
     n_expenses = len(current_expenses)
 
@@ -39,14 +43,14 @@ def get_average_amount() -> Decimal:
         return total
     
     for expense in current_expenses:
-            total = total + expense.amount
+        total = total + expense.amount
 
     average = total/Decimal(n_expenses)
     return average.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
 def get_min_amount() -> Decimal | None:
     """Returns the minimum amount or None"""
-    if len(current_expenses) < 1:
+    if not current_expenses:
         return None
 
     min_amount = current_expenses[0].amount
@@ -58,7 +62,7 @@ def get_min_amount() -> Decimal | None:
      
 def get_max_amount() -> Decimal | None:
     """Returns the maximum amount or None"""
-    if len(current_expenses) < 1:
+    if not current_expenses:
         return None
 
     max_amount = current_expenses[0].amount
@@ -69,13 +73,13 @@ def get_max_amount() -> Decimal | None:
     return max_amount
 
 def get_amount_by_category(alternative_list: list[Expense] | None = None) -> dict[str, Decimal] | None:
-    """Returns a dict containing all expenses category and their total amount or None"""
+    """Returns a dictionary containing the total by category, or “None” if there are no expenses."""
     if alternative_list is None:
         category_list = current_expenses
     else:
         category_list = alternative_list
 
-    if len(category_list) < 1:
+    if not category_list:
         return None
 
     category_dict = {}
@@ -89,33 +93,34 @@ def get_amount_by_category(alternative_list: list[Expense] | None = None) -> dic
     return category_dict
 
 def get_expensive_category(category_dict: dict[str, Decimal] | None) -> list[dict[str, Decimal]] | None:
-    """Returns a dict containing only expensive category and their total amount or None"""
+    """Returns a list of dictionaries containing only the most expensive categories 
+    and their total amount, or None"""
     if category_dict is None or not category_dict:
         return None
-    
-    first_key = list(category_dict.keys())[0]
-    first_value = list(category_dict.values())[0]
-    expensive_category = {"name": first_key, "amount": first_value}
 
+    first_pair = next(iter(category_dict.items()))
+    max_amount = first_pair[1]
+
+    # search the most expensive
     expensive_list = []
     for key, value in category_dict.items():
-        if expensive_category["amount"] < value:
+        if value > max_amount:
+            max_amount = value
+
+    # find the most expensive categories, including ties
+    for key, value in category_dict.items():
+        expensive_category = {}
+        if value == max_amount:
             expensive_category["name"] = key
             expensive_category['amount'] = value
-    expensive_list.append(expensive_category)
+            expensive_list.append(expensive_category)
     
-    for key, value in category_dict.items():
-            temp_category = {}
-            if expensive_category["amount"] == value and expensive_category["name"] != key:
-                temp_category["name"] = key
-                temp_category['amount'] = value
-                expensive_list.append(temp_category)
     return expensive_list
 
 def get_monthly_report(month: int, year: int) -> dict | None:
     """Returns a monthly expense report"""
-    all_expenses = storage.get_all_expenses()
-    monthy_expenses = []
+    all_expenses = get_all_expenses()
+    monthly_expenses = []
 
     temp_year = year
     temp_month = month
@@ -131,24 +136,24 @@ def get_monthly_report(month: int, year: int) -> dict | None:
 
     for expense in all_expenses:
         if first_day <= expense.expense_date < last_day:
-            monthy_expenses.append(expense)
+            monthly_expenses.append(expense)
 
-    if monthy_expenses == []:
+    if not monthly_expenses:
         return None
 
-    categories = get_amount_by_category(monthy_expenses)
+    categories = get_amount_by_category(monthly_expenses)
     expensive_category = get_expensive_category(categories)
 
     month_report = {}
     month_report["date"] = f"{month_name[month]} {year}"
-    month_report["total_expenses"] = len(monthy_expenses)
-    month_report["total_amount"] = get_total_amount(monthy_expenses)
+    month_report["total_expenses"] = len(monthly_expenses)
+    month_report["total_amount"] = get_total_amount(monthly_expenses)
     month_report["expensive_category"] = expensive_category
     return month_report
 
 def get_yearly_report(year: int) -> dict | None:
     """Returns a yearly expense report"""
-    all_expenses = storage.get_all_expenses()
+    all_expenses = get_all_expenses()
     yearly_expenses = []
 
     # calculate the date end range
@@ -159,7 +164,7 @@ def get_yearly_report(year: int) -> dict | None:
         if first_day <= expense.expense_date < last_day:
             yearly_expenses.append(expense)
 
-    if yearly_expenses == []:
+    if not yearly_expenses:
         return None
 
     categories = get_amount_by_category(yearly_expenses)
