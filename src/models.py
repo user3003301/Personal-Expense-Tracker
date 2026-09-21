@@ -78,7 +78,9 @@ class Expense:
     @amount.setter
     def amount(self, value: Decimal) -> None:
         if not isinstance(value, Decimal):
-            raise TypeError("the cost must be a Decimal")
+            raise TypeError("The cost must be a Decimal")
+        if value <= 0:
+            raise ValueError("The cost must be positive and not zero")
         self._amount = value.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
     @property
