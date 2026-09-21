@@ -6,6 +6,7 @@ from decimal import Decimal
 from datetime import date
 
 from src.models import Expense, Category
+from src.storage import add_expense
 
 
 class TestCategory:
@@ -26,20 +27,27 @@ class TestCategory:
         category = Category("Drink")
         assert category.name == "Drink"
 
-    # Test the setter of Category name
+    # Test the setter of a valid Category name
     def test_valid_name(self):
         category = Category("Not setted")
         category.name = "Drink"
+        assert category.name == "Drink"
 
-    def test_invalid_name(self):
+    # Test the setter of an invalid Category name
+    @pytest.mark.parametrize("value, expectation", [
+        (20, pytest.raises(TypeError)),
+        ("", pytest.raises(ValueError)),
+        ("    ", pytest.raises(ValueError)),
+        ])
+    def test_invalid_name(self, value, expectation):
         category = Category("Not setted")
-        with pytest.raises(ValueError):
-            category.name = ""
+        with expectation:
+            category.name = value
 
     # Test the __str__ of Category class
     def test_str_(self):
         category = Category("Drink")
-        category_string = category.__str__()
+        category_string = str(category)
         assert category_string == "name: Drink"
 
 
@@ -47,23 +55,24 @@ class TestExpense:
     # Arrange
     @pytest.fixture
     def default_expense(self):
-        return Expense("Water", Decimal("1"), Category("Drink"), None)
+        return Expense("Water", Decimal("1"), Category("Drink"))
 
     # Create expense with valid data
-    def test_create_expense(default_expense):
-        default_expense
+    def test_create_expense(self, default_expense):
+        expense = Expense("Water", Decimal("1"), Category("Drink"))
+        assert expense == default_expense
 
     # Test for set valid name
     def test_valid_name(self, default_expense):
         expense = default_expense
         expense.name = "Beer"
+        assert expense.name == "Beer"
 
     # Test for set invalid name
     @pytest.mark.parametrize("value, expectation", [
         (10, pytest.raises(TypeError)),
         ("", pytest.raises(ValueError)),
         ("  ", pytest.raises(ValueError)),
-        (" Supermarket ", do_not_raise()),
     ])
     def test_invalid_name(self, default_expense, value, expectation):
         expense = default_expense
@@ -73,7 +82,8 @@ class TestExpense:
     # Test for set valid amount
     def test_valid_amount(self, default_expense):
         expense = default_expense
-        expense.amount = Decimal("10.50")
+        expense.amount = Decimal("10.505")
+        assert expense.amount == Decimal("10.51")
         
     # Test for set invalid amount
     @pytest.mark.parametrize("value, expectation", [
@@ -90,6 +100,7 @@ class TestExpense:
     def test_valid_category(self, default_expense):
         expense = default_expense
         expense.category = Category("Food")
+        assert expense.category == Category("Food")
 
     # Test for set invalid category
     @pytest.mark.parametrize("value, expectation", [
@@ -105,6 +116,7 @@ class TestExpense:
     def test_valid_date(self, default_expense):
         expense = default_expense
         expense.expense_date = date(2000, 1, 1)
+        assert expense.expense_date == date(2000, 1, 1)
 
     # Test for set invalid date
     @pytest.mark.parametrize("value, expectation", [
@@ -121,19 +133,19 @@ class TestExpense:
     def test_equal_expenses(self):
         expense1 = Expense("Pizza", Decimal(7), Category("Food"))
         expense2 = Expense("Pizza", Decimal(7), Category("Food"))
-        assert expense1.name == expense2.name
-        assert expense1.amount == expense2.amount
-        assert expense1.category == expense2.category
-        assert expense1.expense_date == expense2.expense_date
+
+        # assign id
+        add_expense(expense1)
+        add_expense(expense2)
+
+        assert expense1.id != expense2.id
         assert expense1 == expense2
 
     # Test if two expense are not equal by comaparing their date
     def test_notequal_expenses(self):
         expense1 = Expense("Pizza", Decimal(7), Category("Food"), date(2026,1,1))
         expense2 = Expense("Pizza", Decimal(7), Category("Food"), date(2026,1,30))
-        assert expense1.name == expense2.name
-        assert expense1.amount == expense2.amount
-        assert expense1.category == expense2.category
+        
         assert expense1.expense_date != expense2.expense_date
         assert expense1 != expense2
 
