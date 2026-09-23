@@ -1,0 +1,12 @@
+[
+    {"id":1,"name":"Normal Pizza","amount":"6.00","category":"Food","expense_date":"12/08/2026"},
+    {"id":2,"name":"Pepperoni Pizza","amount":"7.00","category":"Food","expense_date":"12/08/2026"},
+    {"id":3,"name":"Naples Pizza","amount":"7.00","category":"Food","expense_date":"12/08/2026"},
+    {"id":4,"name":"Four Cheese Pizza","amount":"8.00","category":"Food","expense_date":"12/08/2026"},
+    {"id":5,"name":"Special Pizza","amount":"10.00","category":"Food","expense_date":"12/08/2026"},
+    {"id":6,"name":"Champagne 96'","amount":"1500","category":"Drink","expense_date":"01/09/2026"},
+    {"id":7,"name":"Mixed Grill","amount":"30.00","category":"Food","expense_date":"01/09/2026"},
+    {"id":8,"name":"Smoking","amount":"500","category":"Clothes","expense_date":"25/09/2026"},
+    {"id":9,"name":"Dior Perfume","amount":"79.99","category":"Accessories","expense_date":"26/09/2026"},
+    {"id":10,"name":"New Car","amount":"40000","category":"Transport","expense_date":"01/12/2026"}
+]

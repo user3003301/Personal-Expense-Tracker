@@ -35,7 +35,7 @@ def test_search_existent_expense(storage_test_configure):
 
 # Test the search of a non-existent expense by its ID
 def test_search_nonexistent_expense():
-    assert storage.search_expense(15) is None
+    assert storage.search_expense(0) is None
 
 # Test the update an existent expense
 def test_update_existent_expense(storage_test_configure):
@@ -50,7 +50,7 @@ def test_update_existent_expense(storage_test_configure):
 # Test the update a non-existent expense
 def test_update_nonexistent_expense():
     updated_expense = Expense("Hamburger", Decimal("7"), Category("Food"))
-    update_result = storage.update_expense(15, updated_expense)
+    update_result = storage.update_expense(0, updated_expense)
     assert update_result == False
 
 # Test the deletion of an existing expense
@@ -63,7 +63,7 @@ def test_delete_existent_expense():
 
 # Test the deletion of an non-existing expense
 def test_delete_nonexisting_expense():
-    result = storage.delete_expense(15)
+    result = storage.delete_expense(0)
     assert result == False
 
 # Test the copy of list expenses
