@@ -13,7 +13,6 @@ def set_up_list():
     load_expenses("tests/expenses_test.json")
     filters.set_filter_list()
     yield
-    # TODO aggiungi un reset globale (Forse)
 
 # Help the tests for assert list serialized with deserialized one
 def build_expected_expenses(expected_list: list) -> list:
@@ -24,6 +23,7 @@ def build_expected_expenses(expected_list: list) -> list:
         amount = Decimal(expense_data.get("amount"))
         category = Category(expense_data.get("category"))
         expense_date = utility.string_to_date(expense_data.get("expense_date"))
+
         loaded_expense = Expense(name, amount, category, expense_date)
         loaded_expense._id = expense_id
         serialized_list.append(loaded_expense)
@@ -94,7 +94,6 @@ def test_filter_by_range_cost(set_up_list):
 # Test the range price filter applied to expenses produce no result
 def test_filter_by_cost_without_result(set_up_list):
     filtered_list = filters.filter_by_cost(Decimal("100"), Decimal("0"))
-    print(filtered_list)
     assert filtered_list == []
 
 # Test the date filter applied to expenses
