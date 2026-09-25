@@ -49,12 +49,12 @@ def deserialize_json_data_into_expense(expenses_data: str) -> int:
     """
     global expenses_list
     max_id = 0
-    for expense_data in expenses_data:  
-        expense_id = expense_data.get("id")
-        name = expense_data.get("name")
-        amount = Decimal(expense_data.get("amount"))
-        category = Category(expense_data.get("category"))
-        expense_date = utility.string_to_date(expense_data.get("expense_date"))
+    for expense_item in expenses_data:  
+        expense_id = expense_item.get("id")
+        name = expense_item.get("name")
+        amount = Decimal(expense_item.get("amount"))
+        category = Category(expense_item.get("category"))
+        expense_date = utility.string_to_date(expense_item.get("expense_date"))
 
         loaded_expense = Expense(name, amount, category, expense_date)
         loaded_expense._id = expense_id
@@ -85,15 +85,15 @@ def serialize_expense_into_json_data() -> list:
         category = expense.category.name
         expense_date = utility.date_to_string(expense.expense_date)
     
-        expense_data = {}
-        expense_data["id"] = expense_id
-        expense_data["name"] = name
-        expense_data["amount"] = amount
-        expense_data["category"] = category
-        expense_data["expense_date"] = expense_date
+        expense_item = {}
+        expense_item["id"] = expense_id
+        expense_item["name"] = name
+        expense_item["amount"] = amount
+        expense_item["category"] = category
+        expense_item["expense_date"] = expense_date
 
-        expenses_data.append(expense_data)
-    return expense_data
+        expenses_data.append(expense_item)
+    return expenses_data
 
 def get_all_expenses() -> list[Expense]:
     """Return a list of expenses saved in a file"""
