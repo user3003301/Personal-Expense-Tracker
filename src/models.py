@@ -12,6 +12,7 @@ from src import utility
 @dataclass
 class Category:
     """Represents a category"""
+    
     _name: str
     
     def __post_init__(self):
@@ -37,6 +38,7 @@ class Category:
 @dataclass
 class Expense:
     """Represents a single expense"""
+
     _id: int | None = field(init=False, compare=False, default=None)
     _name: str
     _amount: Decimal
@@ -105,7 +107,6 @@ class Expense:
             raise TypeError("The date must be a date(year, month, day)")
         self._expense_date = value
 
-    # print class variable
     def __str__(self) -> str:
         return "id: {}, name: {}, amount: {}, category_{}, date: {}".format(
             self._id, self._name, self._amount, self._category, utility.date_to_string(self._expense_date)

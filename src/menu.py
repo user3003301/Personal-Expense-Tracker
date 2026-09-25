@@ -11,6 +11,8 @@ from enums.error_codes import ErrorCode
 
 
 def main_menu() -> None:
+    """The main menu"""
+
     print("\nPersonal Expense Tracker\n")
 
     while True:
@@ -31,11 +33,13 @@ def main_menu() -> None:
     print("\nGoodbye")
 
 def expense_menu() -> None:
+    """The expense management menu"""
+    
     while True:
         print("""\nExpense management:
     1. Create expense
     2. Search expense by ID
-    3. Show expenses with/without filters
+    3. Show expenses with filters
     4. Update expense
     5. Delete expense
     6. Back
@@ -52,6 +56,8 @@ def expense_menu() -> None:
     print()
 
 def statistics_menu() -> None:
+    """The expense statistics menu"""
+
     expense_statistics.get_expenses_list()
 
     while True:
@@ -95,6 +101,7 @@ def statistics_menu() -> None:
             case _: print("Select a number from those shown")
 
 def report_menu() -> None:
+    """The expense report menu"""
     while True:
         print("""\nChoose your operation:
     1. Montly report
@@ -138,6 +145,7 @@ def handle_search_expense() -> None:
         print("Expense not found!")
 
 def set_filter_by_cost() -> None:
+    """Ask if the user wants to filter expense by cost"""
     min_cost = input("Minimum cost [Enter to skip]: ")
     if min_cost != "":
         min_cost = check_input_decimal(min_cost)
@@ -149,12 +157,14 @@ def set_filter_by_cost() -> None:
         check_filter_range_value(min_cost, max_cost, "cost")
 
 def set_filter_by_category() -> None:
+    """Ask if the user wants to filter expense by category"""
     category = input("Category: [Enter to skip]: ")
     if category != "":
         category = check_input_string("Category", category)
         filters.filter_by_category(category)
 
 def set_filter_by_date() -> None:
+    """Ask if the user wants to filter expense by registration date"""
     date_only = ""
     first_date = input("First date [Enter to skip]: ")
     if first_date != "":
@@ -191,6 +201,7 @@ def handle_filter_search() -> None:
     input("Press Enter to continue...")
 
 def enter_updated_data(expense) -> Expense:
+    """Ask the user which data to update"""
     print(f"Current name: {expense.name}")
     new_name = input("New name [Enter to keep]: ")
     if new_name != "":
@@ -248,6 +259,7 @@ def handle_delete_expense() -> None:
         print("Expense not found!")
 
 def handle_monthly_report() -> None:
+    """Create the monthly expense report"""
     print("\nMontly report\n")
     month = 0
     while month < 1 or month > 12:
@@ -259,6 +271,7 @@ def handle_monthly_report() -> None:
     print_report(report_result)
 
 def handle_yearly_report() -> None:
+    """Create the yearly expense report"""
     print("\nYearly report\n")
     year = check_input_integer("Insert year: ")
 
@@ -267,6 +280,7 @@ def handle_yearly_report() -> None:
     print_report(report_result)
 
 def handle_corrupted_file() -> bool:
+    """If the json file is corrupted, ask the user how to continue"""
     print("EXPENSE FILE IS CORRUPTED!\n")
     answer = ""
     while answer != 'Y' and answer != 'N':
@@ -293,16 +307,20 @@ def handle_corrupted_file() -> bool:
         return False
 
 def check_input_string(output: str, word: str) -> str:
-    """Checks that the string is not empty or consists solely of consecutive spaces
-    \nReturns a string with the first letter of each word capitalized"""
+    """Checks that the string is not empty or consists solely of consecutive spaces.
+    
+    Return a string with the first letter of each word capitalized.
+    """
     while word == "" or word.isspace():
         print(f"Invalid {output}! Please try again")
         word = input(f"{output}: ")
     return word.strip().capitalize()
 
 def check_input_integer(output: str) -> int:
-    """Check whether the input is a positive integer number
-    \nReturns a valid value"""
+    """Check whether the input is a positive integer number.
+
+    Return a valid value.
+    """
     while True:
         try:
             number = int(input(output))
@@ -314,8 +332,10 @@ def check_input_integer(output: str) -> int:
             print("Invalid input! Please try again")
 
 def check_input_decimal(number: str) -> Decimal:
-    """Check whether the input is a positive number—either an integer or a decimal
-    \nReturn a valid value"""
+    """Check whether the input is a positive number—either an integer or a decimal.
+
+    Return a valid value.
+    """
     while True:
         try:
             decimal_cost = Decimal(number)
@@ -330,6 +350,10 @@ def check_input_decimal(number: str) -> Decimal:
         number = input("Cost (positive number): ")
 
 def check_date_format(input_date) -> date | None:
+    """Check whether the input is a valid date format like as requested.
+    
+    Return a valid date format
+    """
     while True:
         try:
             return utility.string_to_date(input_date)
@@ -341,6 +365,9 @@ def check_date_format(input_date) -> date | None:
         input_date = input("-> ")
 
 def check_filter_range_value(min_value, max_value, filter_name: str):
+    """Take a minimum and a maximum value and, based on the checks
+    applies a filter to the expenses.
+    """
     if filter_name == "cost":
         if min_value == "": filters.filter_by_cost(None, max_value)
         elif max_value == "": filters.filter_by_cost(min_value, None)
@@ -353,11 +380,12 @@ def check_filter_range_value(min_value, max_value, filter_name: str):
         else: print("The first date is late than the second date!")          
 
 def reset_filter() -> None:
-    """Reset the list"""
+    """Reset the filters applied to the list."""
     filters.set_filter_list()
     expense_statistics.get_expenses_list()
 
 def print_report(report_result: dict) -> None:
+    """Print the report"""
     if report_result is None:
         print("No expense found in this period.")
     else:

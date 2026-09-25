@@ -13,16 +13,16 @@ from src.filters import get_filtered_expenses
 current_expenses = []
 
 def get_expenses_list() -> None:
-    """Get the list of expenses from a filtered list"""
+    """Get the list of expenses from a filtered list."""
     global current_expenses
     current_expenses = get_filtered_expenses()
 
 def get_total_expenses() -> int:
-    """Return the number of expenses in the list"""
+    """Return the number of expenses in the list."""
     return len(current_expenses)
 
 def get_total_amount(alternative_list: list[Expense] | None = None) -> Decimal:
-    """Returns the sum of the expenses"""
+    """Return the sum of the expenses"""
     if alternative_list is None:
         expense_to_process = current_expenses
     else:
@@ -35,7 +35,7 @@ def get_total_amount(alternative_list: list[Expense] | None = None) -> Decimal:
     return total
 
 def get_average_amount() -> Decimal:
-    """Returns the average cost of an expense"""
+    """Return the average cost of an expense."""
     total = Decimal('0')
     n_expenses = len(current_expenses)
 
@@ -49,7 +49,7 @@ def get_average_amount() -> Decimal:
     return average.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
 def get_min_amount() -> Decimal | None:
-    """Returns the minimum amount or None"""
+    """Return the minimum amount or None if the list is empty."""
     if not current_expenses:
         return None
 
@@ -61,7 +61,7 @@ def get_min_amount() -> Decimal | None:
     return min_amount
      
 def get_max_amount() -> Decimal | None:
-    """Returns the maximum amount or None"""
+    """Return the maximum amount or None if the list is empty."""
     if not current_expenses:
         return None
 
@@ -73,7 +73,8 @@ def get_max_amount() -> Decimal | None:
     return max_amount
 
 def get_amount_by_category(alternative_list: list[Expense] | None = None) -> dict[str, Decimal] | None:
-    """Returns a dictionary containing the total by category, or “None” if there are no expenses."""
+    """Return a dictionary containing the total by category or None if the list is empty.
+    """
     if alternative_list is None:
         category_list = current_expenses
     else:
@@ -93,8 +94,9 @@ def get_amount_by_category(alternative_list: list[Expense] | None = None) -> dic
     return category_dict
 
 def get_expensive_category(category_dict: dict[str, Decimal] | None) -> list[dict[str, Decimal]] | None:
-    """Returns a list of dictionaries containing only the most expensive categories 
-    and their total amount, or None"""
+    """Return a list of dictionaries containing only the most expensive categories 
+    and their total amount, or None if the list is empty.
+    """
     if category_dict is None or not category_dict:
         return None
 
@@ -118,7 +120,7 @@ def get_expensive_category(category_dict: dict[str, Decimal] | None) -> list[dic
     return expensive_list
 
 def get_monthly_report(month: int, year: int) -> dict | None:
-    """Returns a monthly expense report"""
+    """Return a dict that represent a monthly expense report."""
     all_expenses = get_all_expenses()
     monthly_expenses = []
 
@@ -152,7 +154,7 @@ def get_monthly_report(month: int, year: int) -> dict | None:
     return month_report
 
 def get_yearly_report(year: int) -> dict | None:
-    """Returns a yearly expense report"""
+    """Return a dict that represent a yearly expense report."""
     all_expenses = get_all_expenses()
     yearly_expenses = []
 

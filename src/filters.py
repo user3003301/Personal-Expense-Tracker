@@ -21,7 +21,9 @@ def get_filtered_expenses() -> list[Expense]:
     return current_expenses.copy()
 
 def filter_by_category(category: str) -> list[Expense]:
-    """Filters the current search results by category and saves it as the new current result."""
+    """Filters the current search results by category and saves it as the 
+    new current result.
+    """
     global current_expenses
     filtered_expenses = []
 
@@ -33,7 +35,9 @@ def filter_by_category(category: str) -> list[Expense]:
     return filtered_expenses
 
 def filter_by_cost(min_cost: Decimal| None, max_cost: Decimal | None) -> list[Expense]:
-    """Filters the current search results by cost range and saves it as the new current result."""
+    """Filters the current search results by cost range and saves it as the 
+    new current result.
+    """
     global current_expenses
     filtered_expenses = []
 
@@ -54,7 +58,9 @@ def filter_by_cost(min_cost: Decimal| None, max_cost: Decimal | None) -> list[Ex
     return filtered_expenses
 
 def filter_by_date(day: date) -> list[Expense]:
-    """Filters the current search results by a single date and saves it as the new current result."""
+    """Filters the current search results by a single date and saves it as the 
+    new current result.
+    """
     global current_expenses
     filtered_expenses = []
 
@@ -66,7 +72,9 @@ def filter_by_date(day: date) -> list[Expense]:
     return filtered_expenses
 
 def filter_by_date_range(start_date: date | None, end_date: date | None) -> list[Expense]:
-    """Filters the current search results based on date range and saves it as the new current result."""
+    """Filters the current search results based on date range and saves it as the 
+    new current result.
+    """
     global current_expenses
     filtered_expenses = []
 

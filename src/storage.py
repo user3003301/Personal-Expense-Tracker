@@ -14,13 +14,13 @@ from enums.error_codes import ErrorCode
 from exception.exceptions import StorageDataCorruptedError
 
 logger = getLogger(__name__)
-expense_list: list[Expense] = []
+expenses_list: list[Expense] = []
 count: int = 1
 
 def load_expenses(filename: str | None = None) -> None:
     """Read the JSON file and save the expenses in a list"""
-    global expense_list, count
-    expense_list = []
+    global expenses_list, count
+    expenses_list = []
     count = 1
 
     path = ""
@@ -41,9 +41,13 @@ def load_expenses(filename: str | None = None) -> None:
         count = max_id + 1
     logger.info("Loading complete")
 
-def deserialize_json_data_into_expense(expenses_data: str):
-    """"""
-    global expense_list
+def deserialize_json_data_into_expense(expenses_data: str) -> int:
+    """take the data read from the JSON file, deserializes it into an Expense
+    object, and adds it to expenses_list.
+
+    Return the next ID to be assigned to the new expense.
+    """
+    global expenses_list
     max_id = 0
     for expense_data in expenses_data:  
         expense_id = expense_data.get("id")
@@ -54,7 +58,7 @@ def deserialize_json_data_into_expense(expenses_data: str):
 
         loaded_expense = Expense(name, amount, category, expense_date)
         loaded_expense._id = expense_id
-        expense_list.append(loaded_expense)
+        expenses_list.append(loaded_expense)
     
         if max_id < expense_id: 
             max_id = expense_id
@@ -70,8 +74,11 @@ def save_expenses() -> None:
     logger.info("Save completed")
 
 def serialize_expense_into_json_data() -> list:
+    """Retrieves data from storage list, serializes all Expense attributes into 
+    JSON format, and adds them into another list, which retrun
+    """
     expenses_data = []
-    for expense in expense_list:
+    for expense in expenses_list:
         expense_id = expense.id
         name = expense.name
         amount = str(expense.amount)
@@ -90,25 +97,25 @@ def serialize_expense_into_json_data() -> list:
 
 def get_all_expenses() -> list[Expense]:
     """Return a list of expenses saved in a file"""
-    return expense_list.copy()
+    return expenses_list.copy()
 
 def add_expense(expense: Expense) -> None:
     """Add a new expense in the expense list"""
     global count
     expense._id = count
-    expense_list.append(expense)
+    expenses_list.append(expense)
     count = count + 1
 
 def search_expense(id: int) -> Expense | None:
     """Return an expense by its id"""
-    for expense in expense_list:
+    for expense in expenses_list:
         if id == expense.id:
             return expense
     return None
 
 def update_expense(id: int, new_expense: Expense) -> bool:
     """Update an expense passing its id and new values by expense obj"""
-    for e in expense_list:
+    for e in expenses_list:
         if id == e._id:
             e.name = new_expense.name
             e.amount = new_expense.amount
@@ -119,13 +126,16 @@ def update_expense(id: int, new_expense: Expense) -> bool:
 
 def delete_expense(id: int) -> bool:
     """Delete an expense passing its id"""
-    for e in expense_list:
+    for e in expenses_list:
         if id == e._id:
-            expense_list.remove(e)
+            expenses_list.remove(e)
             return True
     return False
 
 def backup_corrupted_file() -> ErrorCode:
+    """Returns an ErrorCode enumerator to indicate the result of the operation 
+    to back up the corrupted file and create a new file.
+    """
     date_and_time = datetime.strftime(datetime.now(), "%Y%m%d_%H%M%S")
     try:
         rename("data/expenses.json", f"data/expenses_corrupted_{date_and_time}.json")

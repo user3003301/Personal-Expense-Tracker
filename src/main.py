@@ -1,4 +1,4 @@
-# Program starter
+# Application Launcher
 
 ## Standard Library
 import logging
@@ -8,6 +8,7 @@ from src.menu import main_menu, handle_corrupted_file
 from src.storage import load_expenses
 from src.filters import set_filter_list
 from exception.exceptions import StorageDataCorruptedError
+
 
 logging.basicConfig(
 	filename="logs/expense_tracker.log",
@@ -20,7 +21,13 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
 def main() -> None:
+	"""The application launcher.
+	
+	It loads the data from a JSON file and, if there are no issues, asks 
+	the user what actions they want to take.
+	"""
 	logger.info("Program started")
 	continue_execution = True
 	try:
